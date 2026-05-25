@@ -7,6 +7,7 @@ import {Offer} from '../../types/offer';
 type MapProps = {
   city: City;
   offers: Offer[];
+  block?: 'cities' | 'offer';
 };
 
 const URL_TEMPLATE = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
@@ -18,7 +19,7 @@ const defaultIcon = leaflet.icon({
   iconAnchor: [13.5, 39],
 });
 
-function Map({city, offers}: MapProps): JSX.Element {
+function Map({city, offers, block = 'cities'}: MapProps): JSX.Element {
   const mapRef = useRef<HTMLElement | null>(null);
   const leafletRef = useRef<leaflet.Map | null>(null);
 
@@ -67,7 +68,7 @@ function Map({city, offers}: MapProps): JSX.Element {
   return (
     <section
       ref={mapRef}
-      className="cities__map map"
+      className={`${block}__map map`}
     />
   );
 }
