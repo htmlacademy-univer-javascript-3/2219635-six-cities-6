@@ -15,7 +15,7 @@ function App(): JSX.Element {
         <Route
           path="/favorites"
           element={
-            <PrivateRoute isAuthorized={false}>
+            <PrivateRoute>
               <FavoritesPage />
             </PrivateRoute>
           }
