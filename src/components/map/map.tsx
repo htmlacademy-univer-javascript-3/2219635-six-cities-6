@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react';
+import {memo, useEffect, useRef} from 'react';
 import leaflet from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {City} from '../../types/city';
@@ -81,4 +81,4 @@ function Map({city, offers, activeOfferId, block = 'cities'}: MapProps): JSX.Ele
   );
 }
 
-export default Map;
+export default memo(Map);

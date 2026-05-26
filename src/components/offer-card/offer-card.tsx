@@ -1,3 +1,4 @@
+import {memo} from 'react';
 import {Link} from 'react-router-dom';
 import {Offer} from '../../types/offer';
 
@@ -67,4 +68,4 @@ function OfferCard({offer, block, isActive, onMouseEnter, onMouseLeave}: OfferCa
   );
 }
 
-export default OfferCard;
+export default memo(OfferCard);

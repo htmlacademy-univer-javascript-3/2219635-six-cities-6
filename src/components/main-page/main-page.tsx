@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useMemo, useState, useCallback} from 'react';
 import {Link} from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import OfferList from '../offer-list/offer-list';
@@ -6,11 +6,18 @@ import Map from '../map/map';
 import CityList from '../city-list/city-list';
 import SortingOptions, {SortType} from '../sorting-options/sorting-options';
 import Spinner from '../spinner/spinner';
-import {RootState} from '../../store';
 import {changeCity} from '../../store/action';
+import {
+  selectCity,
+  selectIsOffersLoading,
+  selectAuthorizationStatus,
+  selectUserData,
+  selectCityOffers,
+} from '../../store/selectors';
 import {CITY_NAMES, getCityByName} from '../../mocks/cities';
 import {Offer} from '../../types/offer';
 import {AuthorizationStatus} from '../../types/auth-status';
+import {AppDispatch} from '../../store';
 
 function getSortedOffers(offers: Offer[], sort: SortType): Offer[] {
   switch (sort) {
@@ -26,24 +33,31 @@ function getSortedOffers(offers: Offer[], sort: SortType): Offer[] {
 }
 
 function MainPage(): JSX.Element {
-  const activeCity = useSelector((state: RootState) => state.city);
-  const allOffers = useSelector((state: RootState) => state.offers);
-  const isOffersLoading = useSelector((state: RootState) => state.isOffersLoading);
-  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
-  const userData = useSelector((state: RootState) => state.userData);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const activeCity = useSelector(selectCity);
+  const cityOffers = useSelector(selectCityOffers);
+  const isOffersLoading = useSelector(selectIsOffersLoading);
+  const authorizationStatus = useSelector(selectAuthorizationStatus);
+  const userData = useSelector(selectUserData);
 
   const [activeOfferId, setActiveOfferId] = useState<string | null>(null);
   const [activeSort, setActiveSort] = useState<SortType>('Popular');
 
-  const cityOffers = allOffers.filter((offer) => offer.city.name === activeCity);
-  const sortedOffers = getSortedOffers(cityOffers, activeSort);
-  const cityData = getCityByName(activeCity);
+  const sortedOffers = useMemo(
+    () => getSortedOffers(cityOffers, activeSort),
+    [cityOffers, activeSort]
+  );
 
-  const handleCityChange = (city: string) => {
+  const cityData = useMemo(() => getCityByName(activeCity), [activeCity]);
+
+  const handleCityChange = useCallback((city: string) => {
     dispatch(changeCity(city));
     setActiveSort('Popular');
-  };
+  }, [dispatch]);
+
+  const handleOfferHover = useCallback((id: string | null) => {
+    setActiveOfferId(id);
+  }, []);
 
   if (isOffersLoading) {
     return <Spinner />;
@@ -108,7 +122,7 @@ function MainPage(): JSX.Element {
               <OfferList
                 offers={sortedOffers}
                 activeOfferId={activeOfferId}
-                onOfferHover={setActiveOfferId}
+                onOfferHover={handleOfferHover}
               />
             </section>
             <div className="cities__right-section">

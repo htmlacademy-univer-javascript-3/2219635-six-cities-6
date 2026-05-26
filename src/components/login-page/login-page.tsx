@@ -2,7 +2,7 @@ import {FormEvent, useRef} from 'react';
 import {Link, Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {login} from '../../store/api-actions';
-import {RootState} from '../../store';
+import {selectAuthorizationStatus} from '../../store/selectors';
 import {AuthorizationStatus} from '../../types/auth-status';
 import {AppDispatch} from '../../store';
 
@@ -10,7 +10,7 @@ function LoginPage(): JSX.Element {
   const loginRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
-  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
+  const authorizationStatus = useSelector(selectAuthorizationStatus);
 
   if (authorizationStatus === AuthorizationStatus.Auth) {
     return <Navigate to="/" />;

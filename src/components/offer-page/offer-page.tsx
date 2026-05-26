@@ -6,7 +6,14 @@ import NearPlacesList from '../near-places-list/near-places-list';
 import Map from '../map/map';
 import Spinner from '../spinner/spinner';
 import {fetchOffer, fetchNearbyOffers, fetchReviews} from '../../store/api-actions';
-import {RootState, AppDispatch} from '../../store';
+import {
+  selectCurrentOffer,
+  selectNearbyOffers,
+  selectReviews,
+  selectIsOfferLoading,
+  selectAuthorizationStatus,
+} from '../../store/selectors';
+import {AppDispatch} from '../../store';
 import {AuthorizationStatus} from '../../types/auth-status';
 
 const MAX_IMAGES_COUNT = 6;
@@ -22,11 +29,11 @@ function OfferPage(): JSX.Element {
   const {id} = useParams<{id: string}>();
   const dispatch = useDispatch<AppDispatch>();
 
-  const currentOffer = useSelector((state: RootState) => state.currentOffer);
-  const nearbyOffers = useSelector((state: RootState) => state.nearbyOffers);
-  const reviews = useSelector((state: RootState) => state.reviews);
-  const isOfferLoading = useSelector((state: RootState) => state.isOfferLoading);
-  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
+  const currentOffer = useSelector(selectCurrentOffer);
+  const nearbyOffers = useSelector(selectNearbyOffers);
+  const reviews = useSelector(selectReviews);
+  const isOfferLoading = useSelector(selectIsOfferLoading);
+  const authorizationStatus = useSelector(selectAuthorizationStatus);
 
   useEffect(() => {
     if (id) {

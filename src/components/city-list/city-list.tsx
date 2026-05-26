@@ -1,3 +1,5 @@
+import {memo} from 'react';
+
 type CityListProps = {
   cities: string[];
   activeCity: string;
@@ -25,4 +27,4 @@ function CityList({cities, activeCity, onCityChange}: CityListProps): JSX.Elemen
   );
 }
 
-export default CityList;
+export default memo(CityList);
