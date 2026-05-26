@@ -1,12 +1,10 @@
 import {Link} from 'react-router-dom';
+import {useSelector} from 'react-redux';
 import OfferCard from '../offer-card/offer-card';
-import {Offer} from '../../types/offer';
+import {RootState} from '../../store';
 
-type FavoritesPageProps = {
-  offers: Offer[];
-};
-
-function FavoritesPage({offers}: FavoritesPageProps): JSX.Element {
+function FavoritesPage(): JSX.Element {
+  const offers = useSelector((state: RootState) => state.offers);
   const favoriteOffers = offers.filter((offer) => offer.isFavorite);
   const cities = [...new Set(favoriteOffers.map((offer) => offer.city))];
 
