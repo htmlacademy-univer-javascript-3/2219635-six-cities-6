@@ -7,6 +7,7 @@ import {Offer} from '../../types/offer';
 type MapProps = {
   city: City;
   offers: Offer[];
+  activeOfferId?: string | null;
   block?: 'cities' | 'offer';
 };
 
@@ -19,7 +20,13 @@ const defaultIcon = leaflet.icon({
   iconAnchor: [13.5, 39],
 });
 
-function Map({city, offers, block = 'cities'}: MapProps): JSX.Element {
+const activeIcon = leaflet.icon({
+  iconUrl: 'img/pin-active.svg',
+  iconSize: [27, 39],
+  iconAnchor: [13.5, 39],
+});
+
+function Map({city, offers, activeOfferId, block = 'cities'}: MapProps): JSX.Element {
   const mapRef = useRef<HTMLElement | null>(null);
   const leafletRef = useRef<leaflet.Map | null>(null);
 
@@ -49,11 +56,12 @@ function Map({city, offers, block = 'cities'}: MapProps): JSX.Element {
       const markers: leaflet.Marker[] = [];
 
       offers.forEach((offer) => {
+        const icon = offer.id === activeOfferId ? activeIcon : defaultIcon;
         markers.push(
           leaflet
             .marker(
               {lat: offer.location.latitude, lng: offer.location.longitude},
-              {icon: defaultIcon}
+              {icon}
             )
             .addTo(leafletRef.current!)
         );
@@ -63,7 +71,7 @@ function Map({city, offers, block = 'cities'}: MapProps): JSX.Element {
         markers.forEach((marker) => marker.remove());
       };
     }
-  }, [offers]);
+  }, [offers, activeOfferId]);
 
   return (
     <section
