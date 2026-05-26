@@ -6,6 +6,7 @@ import Map from '../map/map';
 import CityList from '../city-list/city-list';
 import SortingOptions, {SortType} from '../sorting-options/sorting-options';
 import Spinner from '../spinner/spinner';
+import MainEmpty from '../main-empty/main-empty';
 import {changeCity} from '../../store/action';
 import {
   selectCity,
@@ -13,6 +14,7 @@ import {
   selectAuthorizationStatus,
   selectUserData,
   selectCityOffers,
+  selectFavoriteOffers,
 } from '../../store/selectors';
 import {CITY_NAMES, getCityByName} from '../../mocks/cities';
 import {Offer} from '../../types/offer';
@@ -39,6 +41,7 @@ function MainPage(): JSX.Element {
   const isOffersLoading = useSelector(selectIsOffersLoading);
   const authorizationStatus = useSelector(selectAuthorizationStatus);
   const userData = useSelector(selectUserData);
+  const favoriteOffers = useSelector(selectFavoriteOffers);
 
   const [activeOfferId, setActiveOfferId] = useState<string | null>(null);
   const [activeSort, setActiveSort] = useState<SortType>('Popular');
@@ -63,6 +66,8 @@ function MainPage(): JSX.Element {
     return <Spinner />;
   }
 
+  const isEmpty = cityOffers.length === 0;
+
   return (
     <div className="page page--gray page--main">
       <header className="header">
@@ -82,7 +87,7 @@ function MainPage(): JSX.Element {
                         <div className="header__avatar-wrapper user__avatar-wrapper">
                         </div>
                         <span className="header__user-name user__name">{userData?.email}</span>
-                        <span className="header__favorite-count">3</span>
+                        <span className="header__favorite-count">{favoriteOffers.length}</span>
                       </Link>
                     </li>
                     <li className="header__nav-item">
@@ -106,7 +111,7 @@ function MainPage(): JSX.Element {
         </div>
       </header>
 
-      <main className="page__main page__main--index">
+      <main className={`page__main page__main--index${isEmpty ? ' page__main--index-empty' : ''}`}>
         <h1 className="visually-hidden">Cities</h1>
         <div className="tabs">
           <section className="locations container">
@@ -114,21 +119,25 @@ function MainPage(): JSX.Element {
           </section>
         </div>
         <div className="cities">
-          <div className="cities__places-container container">
-            <section className="cities__places places">
-              <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">{sortedOffers.length} places to stay in {activeCity}</b>
-              <SortingOptions activeSort={activeSort} onSortChange={setActiveSort} />
-              <OfferList
-                offers={sortedOffers}
-                activeOfferId={activeOfferId}
-                onOfferHover={handleOfferHover}
-              />
-            </section>
-            <div className="cities__right-section">
-              <Map city={cityData} offers={sortedOffers} activeOfferId={activeOfferId} />
+          {isEmpty ? (
+            <MainEmpty city={activeCity} />
+          ) : (
+            <div className="cities__places-container container">
+              <section className="cities__places places">
+                <h2 className="visually-hidden">Places</h2>
+                <b className="places__found">{sortedOffers.length} places to stay in {activeCity}</b>
+                <SortingOptions activeSort={activeSort} onSortChange={setActiveSort} />
+                <OfferList
+                  offers={sortedOffers}
+                  activeOfferId={activeOfferId}
+                  onOfferHover={handleOfferHover}
+                />
+              </section>
+              <div className="cities__right-section">
+                <Map city={cityData} offers={sortedOffers} activeOfferId={activeOfferId} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
     </div>

@@ -16,6 +16,11 @@ type NewReview = {
   rating: number;
 };
 
+type ToggleFavoriteParams = {
+  offerId: string;
+  status: 0 | 1;
+};
+
 export const fetchOffers = createAsyncThunk<
   Offer[],
   undefined,
@@ -97,6 +102,30 @@ export const login = createAsyncThunk<
   async ({email, password}, {extra: api}) => {
     const {data} = await api.post<AuthInfo>('/login', {email, password});
     saveToken(data.token);
+    return data;
+  }
+);
+
+export const fetchFavorites = createAsyncThunk<
+  Offer[],
+  undefined,
+  {extra: AxiosInstance}
+>(
+  'data/fetchFavorites',
+  async (_arg, {extra: api}) => {
+    const {data} = await api.get<Offer[]>('/favorite');
+    return data;
+  }
+);
+
+export const toggleFavorite = createAsyncThunk<
+  Offer,
+  ToggleFavoriteParams,
+  {extra: AxiosInstance}
+>(
+  'data/toggleFavorite',
+  async ({offerId, status}, {extra: api}) => {
+    const {data} = await api.post<Offer>(`/favorite/${offerId}/${status}`);
     return data;
   }
 );

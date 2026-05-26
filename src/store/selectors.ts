@@ -7,6 +7,7 @@ export const selectIsOffersLoading = (state: RootState) => state[NameSpace.App].
 export const selectIsOfferLoading = (state: RootState) => state[NameSpace.App].isOfferLoading;
 
 export const selectOffers = (state: RootState) => state[NameSpace.Data].offers;
+export const selectFavoriteOffers = (state: RootState) => state[NameSpace.Data].favoriteOffers;
 export const selectCurrentOffer = (state: RootState) => state[NameSpace.Data].currentOffer;
 export const selectNearbyOffers = (state: RootState) => state[NameSpace.Data].nearbyOffers;
 export const selectReviews = (state: RootState) => state[NameSpace.Data].reviews;
@@ -17,9 +18,4 @@ export const selectUserData = (state: RootState) => state[NameSpace.User].userDa
 export const selectCityOffers = createSelector(
   [selectOffers, selectCity],
   (offers, city) => offers.filter((offer) => offer.city.name === city)
-);
-
-export const selectFavoriteOffers = createSelector(
-  [selectOffers],
-  (offers) => offers.filter((offer) => offer.isFavorite)
 );
