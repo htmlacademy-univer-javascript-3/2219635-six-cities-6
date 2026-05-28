@@ -1,7 +1,7 @@
 import {describe, it, expect} from 'vitest';
 import {userReducer} from './user.reducer';
 import {requireAuthorization} from '../action';
-import {checkAuth, login} from '../api-actions';
+import {checkAuth, login, logout} from '../api-actions';
 import {AuthorizationStatus} from '../../types/auth-status';
 import {makeMockAuthInfo} from '../../utils/mock';
 
@@ -48,5 +48,13 @@ describe('userReducer', () => {
   it('should set NoAuth on login.rejected', () => {
     const result = userReducer(initialState, login.rejected(null, '', {email: '', password: ''}));
     expect(result.authorizationStatus).toBe(AuthorizationStatus.NoAuth);
+  });
+
+  it('should set NoAuth and clear userData on logout.fulfilled', () => {
+    const authInfo = makeMockAuthInfo();
+    const state = {authorizationStatus: AuthorizationStatus.Auth, userData: authInfo};
+    const result = userReducer(state, logout.fulfilled(undefined, '', undefined));
+    expect(result.authorizationStatus).toBe(AuthorizationStatus.NoAuth);
+    expect(result.userData).toBeNull();
   });
 });

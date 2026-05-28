@@ -1,11 +1,12 @@
-import {useEffect} from 'react';
-import {Link, Navigate, useParams} from 'react-router-dom';
+import {useEffect, useMemo, useCallback} from 'react';
+import {Navigate, useParams, useNavigate} from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import ReviewList from '../review-list/review-list';
 import NearPlacesList from '../near-places-list/near-places-list';
 import Map from '../map/map';
 import Spinner from '../spinner/spinner';
-import {fetchOffer, fetchNearbyOffers, fetchReviews} from '../../store/api-actions';
+import Header from '../header/header';
+import {fetchOffer, fetchNearbyOffers, fetchReviews, toggleFavorite} from '../../store/api-actions';
 import {
   selectCurrentOffer,
   selectNearbyOffers,
@@ -17,6 +18,7 @@ import {AppDispatch} from '../../store';
 import {AuthorizationStatus} from '../../types/auth-status';
 
 const MAX_IMAGES_COUNT = 6;
+const MAX_NEARBY_COUNT = 3;
 
 const OFFER_TYPE_MAP: Record<string, string> = {
   apartment: 'Apartment',
@@ -28,6 +30,7 @@ const OFFER_TYPE_MAP: Record<string, string> = {
 function OfferPage(): JSX.Element {
   const {id} = useParams<{id: string}>();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const currentOffer = useSelector(selectCurrentOffer);
   const nearbyOffers = useSelector(selectNearbyOffers);
@@ -42,6 +45,24 @@ function OfferPage(): JSX.Element {
       dispatch(fetchReviews(id));
     }
   }, [id, dispatch]);
+
+  const nearbySlice = nearbyOffers.slice(0, MAX_NEARBY_COUNT);
+
+  const mapOffers = useMemo(
+    () => currentOffer ? [...nearbySlice, currentOffer] : nearbySlice,
+    [nearbySlice, currentOffer]
+  );
+
+  const handleBookmarkClick = useCallback(() => {
+    if (!currentOffer) {
+      return;
+    }
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate('/login');
+      return;
+    }
+    dispatch(toggleFavorite({offerId: currentOffer.id, status: currentOffer.isFavorite ? 0 : 1}));
+  }, [authorizationStatus, currentOffer, dispatch, navigate]);
 
   if (isOfferLoading) {
     return <Spinner />;
@@ -62,34 +83,7 @@ function OfferPage(): JSX.Element {
 
   return (
     <div className="page">
-      <header className="header">
-        <div className="container">
-          <div className="header__wrapper">
-            <div className="header__left">
-              <Link className="header__logo-link" to="/">
-                <img className="header__logo" src="img/logo.svg" alt="6 cities logo" width="81" height="41" />
-              </Link>
-            </div>
-            <nav className="header__nav">
-              <ul className="header__nav-list">
-                <li className="header__nav-item user">
-                  <Link className="header__nav-link header__nav-link--profile" to="/favorites">
-                    <div className="header__avatar-wrapper user__avatar-wrapper">
-                    </div>
-                    <span className="header__user-name user__name">Oliver.conner@gmail.com</span>
-                    <span className="header__favorite-count">3</span>
-                  </Link>
-                </li>
-                <li className="header__nav-item">
-                  <a className="header__nav-link" href="#todo">
-                    <span className="header__signout">Sign out</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="page__main page__main--offer">
         <section className="offer">
@@ -114,6 +108,7 @@ function OfferPage(): JSX.Element {
                 <button
                   className={`offer__bookmark-button button${isFavorite ? ' offer__bookmark-button--active' : ''}`}
                   type="button"
+                  onClick={handleBookmarkClick}
                 >
                   <svg className="offer__bookmark-icon" width="31" height="33">
                     <use href="#icon-bookmark"></use>
@@ -130,8 +125,12 @@ function OfferPage(): JSX.Element {
               </div>
               <ul className="offer__features">
                 <li className="offer__feature offer__feature--entire">{offerType}</li>
-                <li className="offer__feature offer__feature--bedrooms">{bedrooms} Bedrooms</li>
-                <li className="offer__feature offer__feature--adults">Max {maxAdults} adults</li>
+                <li className="offer__feature offer__feature--bedrooms">
+                  {bedrooms} {bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}
+                </li>
+                <li className="offer__feature offer__feature--adults">
+                  Max {maxAdults} {maxAdults === 1 ? 'adult' : 'adults'}
+                </li>
               </ul>
               <div className="offer__price">
                 <b className="offer__price-value">&euro;{price}</b>
@@ -171,12 +170,12 @@ function OfferPage(): JSX.Element {
               />
             </div>
           </div>
-          <Map city={city} offers={nearbyOffers} block="offer" />
+          <Map city={city} offers={mapOffers} activeOfferId={currentOffer.id} block="offer" />
         </section>
         <div className="container">
           <section className="near-places places">
             <h2 className="near-places__title">Other places in the neighbourhood</h2>
-            <NearPlacesList offers={nearbyOffers} />
+            <NearPlacesList offers={nearbySlice} />
           </section>
         </div>
       </main>

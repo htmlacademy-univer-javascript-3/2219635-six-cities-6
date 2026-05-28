@@ -13,6 +13,7 @@ import {
   checkAuth,
   fetchFavorites,
   toggleFavorite,
+  logout,
 } from './api-actions';
 import {makeMockOffer, makeMockReview, makeMockAuthInfo} from '../utils/mock';
 
@@ -135,6 +136,16 @@ describe('api-actions', () => {
       const store = makeStore();
       await store.dispatch(toggleFavorite({offerId: offer.id, status: 1}));
       expect(store.getState()[NameSpace.Data].favoriteOffers).toContainEqual(updated);
+    });
+  });
+
+  describe('logout', () => {
+    it('should set NoAuth and clear userData on success', async () => {
+      mockAPI.onDelete('/login').reply(204);
+      const store = makeStore();
+      await store.dispatch(logout());
+      expect(store.getState()[NameSpace.User].authorizationStatus).toBe('NO_AUTH');
+      expect(store.getState()[NameSpace.User].userData).toBeNull();
     });
   });
 });

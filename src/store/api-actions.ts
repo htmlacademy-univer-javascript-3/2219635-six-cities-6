@@ -3,7 +3,7 @@ import {AxiosInstance} from 'axios';
 import {Offer} from '../types/offer';
 import {Review} from '../types/review';
 import {AuthInfo} from '../types/auth-info';
-import {saveToken} from '../services/token';
+import {saveToken, dropToken} from '../services/token';
 
 type LoginCredentials = {
   email: string;
@@ -127,5 +127,13 @@ export const toggleFavorite = createAsyncThunk<
   async ({offerId, status}, {extra: api}) => {
     const {data} = await api.post<Offer>(`/favorite/${offerId}/${status}`);
     return data;
+  }
+);
+
+export const logout = createAsyncThunk<void, undefined, {extra: AxiosInstance}>(
+  'user/logout',
+  async (_arg, {extra: api}) => {
+    await api.delete('/login');
+    dropToken();
   }
 );
