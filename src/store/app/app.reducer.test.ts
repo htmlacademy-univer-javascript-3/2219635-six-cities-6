@@ -33,7 +33,7 @@ describe('appReducer', () => {
 
   it('should set isOffersLoading to false on fetchOffers.rejected', () => {
     const state = {...initialState, isOffersLoading: true};
-    const result = appReducer(state, fetchOffers.rejected(null, ''));
+    const result = appReducer(state, fetchOffers.rejected(null, '', undefined));
     expect(result.isOffersLoading).toBe(false);
   });
 

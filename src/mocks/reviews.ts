@@ -2,7 +2,7 @@ import {Review} from '../types/review';
 
 export const reviews: Review[] = [
   {
-    id: '1',
+    id: 1,
     user: {
       name: 'Max',
       avatarUrl: 'img/avatar-max.jpg',
@@ -13,7 +13,7 @@ export const reviews: Review[] = [
     date: '2019-04-24T00:00:00.000Z',
   },
   {
-    id: '2',
+    id: 2,
     user: {
       name: 'Anna',
       avatarUrl: 'img/avatar-angelina.jpg',

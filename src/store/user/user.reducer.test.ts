@@ -33,7 +33,7 @@ describe('userReducer', () => {
   });
 
   it('should set NoAuth on checkAuth.rejected', () => {
-    const result = userReducer(initialState, checkAuth.rejected(null, ''));
+    const result = userReducer(initialState, checkAuth.rejected(null, '', undefined));
     expect(result.authorizationStatus).toBe(AuthorizationStatus.NoAuth);
     expect(result.userData).toBeNull();
   });
