@@ -84,7 +84,7 @@ describe('LoginPage', () => {
     });
   });
 
-  it('should not dispatch login when password has no digits', async () => {
+  it('should not dispatch login when password has no digits', () => {
     mockAPI.onPost('/login').reply(200, {
       id: 1, email: 'test@test.com', name: 'Test', avatarUrl: 'http://avatar.com', isPro: false, token: 'token123',
     });
